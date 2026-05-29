@@ -70,7 +70,7 @@ The only subprocesses during runtime are local audio playback through `ffplay`, 
 - Kali-style tool flows with purpose descriptions, per-tool help, output fields, error states, and guided scenarios.
 - Real downloaded voice cues for tool starts, hits, mission accomplishments, and games.
 - Downloaded free/open source music for each mode, stored in `assets/music`.
-- Volume controls inside the terminal: `volume up`, `volume down`, or `volume 0-100`. The `-`, `+`, and `=` keys type normally.
+- Keyboard volume controls inside the terminal: `+`, `-`, `volume up`, `volume down`, or `volume 0-100`.
 - Games: cipher, firewall, breach, snake, adventure, and a current-mode special game.
 - Boss mini-event: press X to defeat a trace.
 - Command history with Up/Down arrows.

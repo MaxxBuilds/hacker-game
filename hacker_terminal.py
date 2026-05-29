@@ -109,7 +109,7 @@ HELP = [
     "",
     "SETTINGS",
     "  volume up/down    adjust volume",
-    "  volume 0-100      set volume",
+    "  + or -            adjust volume",
     "  sound on/off      toggle audio",
     "  fullscreen on/off toggle fullscreen",
     "  theme NAME        blue, matrix, red, purple, amber",
@@ -431,37 +431,38 @@ class App:
 
     def build_ui(self):
         c = self.colors()
-        top = tk.Frame(self.root, bg=c["panel"], height=46)
-        top.pack(fill="x")
-        self.title_label = tk.Label(top, text=f"{self.mode['label']} // AGENT {self.agent_name.upper()}", bg=c["panel"], fg=c["fg"], font=self.title_font)
+        self.top_frame = tk.Frame(self.root, bg=c["panel"], height=46)
+        self.top_frame.pack(fill="x")
+        self.title_label = tk.Label(self.top_frame, text=f"{self.mode['label']} // AGENT {self.agent_name.upper()}", bg=c["panel"], fg=c["fg"], font=self.title_font)
         self.title_label.pack(side="left", padx=12, pady=8)
-        self.sim_label = tk.Label(top, text="TRAINING RANGE", bg=c["panel"], fg=c["accent"], font=self.small_font)
+        self.sim_label = tk.Label(self.top_frame, text="TRAINING RANGE", bg=c["panel"], fg=c["accent"], font=self.small_font)
         self.sim_label.pack(side="left", padx=16, pady=10)
         self.status_var = tk.StringVar(value=random.choice(self.mode["status"]))
-        self.status_label = tk.Label(top, textvariable=self.status_var, bg=c["panel"], fg=c["accent"], font=self.small_font)
+        self.status_label = tk.Label(self.top_frame, textvariable=self.status_var, bg=c["panel"], fg=c["accent"], font=self.small_font)
         self.status_label.pack(side="right", padx=12, pady=10)
 
-        body = tk.Frame(self.root, bg=c["bg"])
-        body.pack(fill="both", expand=True)
-        self.bg_canvas = tk.Canvas(body, bg=c["bg"], highlightthickness=0)
+        self.body_frame = tk.Frame(self.root, bg=c["bg"])
+        self.body_frame.pack(fill="both", expand=True)
+        self.bg_canvas = tk.Canvas(self.body_frame, bg=c["bg"], highlightthickness=0)
         self.bg_canvas.place(relx=0, rely=0, relwidth=1, relheight=1)
-        left = tk.Frame(body, bg=c["bg"])
-        left.pack(side="left", fill="both", expand=True)
-        right = tk.Frame(body, bg=c["bg"], width=330)
-        right.pack(side="right", fill="y")
-        right.pack_propagate(False)
-        left.lift()
-        right.lift()
+        self.left_frame = tk.Frame(self.body_frame, bg=c["bg"])
+        self.left_frame.pack(side="left", fill="both", expand=True)
+        self.right_frame = tk.Frame(self.body_frame, bg=c["bg"], width=330)
+        self.right_frame.pack(side="right", fill="y")
+        self.right_frame.pack_propagate(False)
+        self.left_frame.lift()
+        self.right_frame.lift()
 
-        self.text = tk.Text(left, bg=c["text_bg"], fg=c["fg"], insertbackground=c["fg"], relief="flat", wrap="word", font=self.main_font, padx=16, pady=16, state="disabled", takefocus=0)
+        self.text = tk.Text(self.left_frame, bg=c["text_bg"], fg=c["fg"], insertbackground=c["fg"], relief="flat", wrap="word", font=self.main_font, padx=16, pady=16, state="disabled", takefocus=0)
         self.text.pack(fill="both", expand=True, padx=(8, 0), pady=8)
         self.text.tag_configure("danger", foreground=c["danger"])
         self.text.tag_configure("accent", foreground=c["accent"])
 
-        bottom = tk.Frame(left, bg=c["bg"])
-        bottom.pack(fill="x", padx=16, pady=(0, 16))
-        tk.Label(bottom, text="COMMAND:", bg=c["bg"], fg=c["accent"], font=self.small_font).pack(anchor="w")
-        self.cmd_frame = tk.Frame(bottom, bg=c["text_bg"], highlightbackground=c["fg"], highlightthickness=2)
+        self.bottom_frame = tk.Frame(self.left_frame, bg=c["bg"])
+        self.bottom_frame.pack(fill="x", padx=16, pady=(0, 16))
+        self.command_title_label = tk.Label(self.bottom_frame, text="COMMAND:", bg=c["bg"], fg=c["accent"], font=self.small_font)
+        self.command_title_label.pack(anchor="w")
+        self.cmd_frame = tk.Frame(self.bottom_frame, bg=c["text_bg"], highlightbackground=c["fg"], highlightthickness=2)
         self.cmd_frame.pack(fill="x", pady=(4, 0))
         self.prompt_var = tk.StringVar(value=self.random_prompt())
         self.prompt_label = tk.Label(self.cmd_frame, textvariable=self.prompt_var, bg=c["text_bg"], fg=c["fg"], font=self.main_font)
@@ -472,17 +473,20 @@ class App:
         self.cursor_var = tk.StringVar(value="█")
         self.cursor_label = tk.Label(self.cmd_frame, textvariable=self.cursor_var, bg=c["text_bg"], fg=c["fg"], font=self.main_font)
         self.cursor_label.pack(side="right", padx=(0, 8), pady=6)
-        tk.Label(bottom, text="Type help. Escape or Ctrl+Q exits.", bg=c["bg"], fg=c["accent"], font=self.small_font).pack(anchor="w", pady=(6, 0))
+        self.hint_label = tk.Label(self.bottom_frame, text="Type help. Escape or Ctrl+Q exits.", bg=c["bg"], fg=c["accent"], font=self.small_font)
+        self.hint_label.pack(anchor="w", pady=(6, 0))
 
-        self.badge = tk.Canvas(right, bg=c["text_bg"], highlightthickness=1, highlightbackground=c["dim"], width=300, height=130)
+        self.badge = tk.Canvas(self.right_frame, bg=c["text_bg"], highlightthickness=1, highlightbackground=c["dim"], width=300, height=130)
         self.badge.pack(padx=12, pady=(12, 8))
-        tk.Label(right, text="SIGNAL MAP", bg=c["bg"], fg=c["fg"], font=self.title_font).pack(anchor="n", pady=(2, 4))
-        self.graph = tk.Canvas(right, bg=c["text_bg"], highlightthickness=1, highlightbackground=c["dim"], width=300, height=170)
+        self.signal_label = tk.Label(self.right_frame, text="SIGNAL MAP", bg=c["bg"], fg=c["fg"], font=self.title_font)
+        self.signal_label.pack(anchor="n", pady=(2, 4))
+        self.graph = tk.Canvas(self.right_frame, bg=c["text_bg"], highlightthickness=1, highlightbackground=c["dim"], width=300, height=170)
         self.graph.pack(padx=12, pady=(0, 8))
-        tk.Label(right, text="DATA RAIN", bg=c["bg"], fg=c["fg"], font=self.title_font).pack(anchor="n", pady=(2, 4))
-        self.matrix = tk.Canvas(right, bg=c["text_bg"], highlightthickness=1, highlightbackground=c["dim"], width=300)
+        self.data_rain_label = tk.Label(self.right_frame, text="DATA RAIN", bg=c["bg"], fg=c["fg"], font=self.title_font)
+        self.data_rain_label.pack(anchor="n", pady=(2, 4))
+        self.matrix = tk.Canvas(self.right_frame, bg=c["text_bg"], highlightthickness=1, highlightbackground=c["dim"], width=300)
         self.matrix.pack(fill="both", expand=True, padx=12, pady=(0, 8))
-        self.scanbar = tk.Canvas(right, bg=c["text_bg"], highlightthickness=1, highlightbackground=c["dim"], width=300, height=96)
+        self.scanbar = tk.Canvas(self.right_frame, bg=c["text_bg"], highlightthickness=1, highlightbackground=c["dim"], width=300, height=96)
         self.scanbar.pack(padx=12, pady=(0, 12))
         self.flash = tk.Label(self.root, text="", bg=c["bg"], fg=c["accent"], font=self.big_font)
         self.flash.place_forget()
@@ -549,7 +553,7 @@ class App:
         for _ in range(10):
             self.nodes.append([random.randint(25, 275), random.randint(25, 145), random.choice([0, 1, 2])])
 
-    def animate_background(self):
+    def draw_background_frame(self):
         c = self.colors()
         if not hasattr(self, "bg_canvas"):
             return
@@ -579,6 +583,9 @@ class App:
                 self.bg_canvas.create_line(x1, y1, x2, y2, fill=c["dim"], width=1)
                 self.bg_canvas.create_rectangle(x1-3, y1-3, x1+3, y1+3, fill=c["fg"], outline="")
         self.bg_tick += 1
+
+    def animate_background(self):
+        self.draw_background_frame()
         self.root.after(130, self.animate_background)
 
     def animate_matrix(self):
@@ -695,9 +702,12 @@ class App:
         if event.state & 0x4 and event.keysym.lower() == "q":
             self.close_app()
             return "break"
-        # Do not bind normal +/-/= typing keys to volume. On Linux Mint Cinnamon
-        # those keys must enter text normally; volume is controlled with typed
-        # commands such as "volume up", "volume down", or "volume 0-100".
+        if event.keysym in ("plus", "KP_Add", "equal") or event.char == "+":
+            self.adjust_volume(10)
+            return "break"
+        if event.keysym in ("minus", "KP_Subtract") or event.char == "-":
+            self.adjust_volume(-10)
+            return "break"
         if self.boss_active and event.char and event.char.lower() == "x":
             self.boss_hits += 1
             self.flash_message(f"TRACE HIT {self.boss_hits}/7", 500)
@@ -866,18 +876,24 @@ class App:
     def apply_theme(self):
         c = self.colors()
         self.root.configure(bg=c["bg"])
+        for frame in (self.top_frame, self.body_frame, self.left_frame, self.right_frame, self.bottom_frame):
+            frame.configure(bg=c["panel"] if frame is self.top_frame else c["bg"])
         for w in (self.title_label, self.sim_label, self.status_label):
             w.configure(bg=c["panel"])
         self.title_label.configure(fg=c["fg"]); self.sim_label.configure(fg=c["accent"]); self.status_label.configure(fg=c["accent"])
+        for w in (self.command_title_label, self.hint_label, self.signal_label, self.data_rain_label):
+            w.configure(bg=c["bg"], fg=c["accent"] if w in (self.command_title_label, self.hint_label) else c["fg"])
         self.text.configure(bg=c["text_bg"], fg=c["fg"], insertbackground=c["fg"])
         self.text.tag_configure("danger", foreground=c["danger"]); self.text.tag_configure("accent", foreground=c["accent"])
         self.cmd_frame.configure(bg=c["text_bg"], highlightbackground=c["fg"])
         for w, color in ((self.prompt_label, c["fg"]), (self.command_label, c["accent"]), (self.cursor_label, c["fg"])):
             w.configure(bg=c["text_bg"], fg=color)
-        for canv in (self.badge, self.matrix, self.scanbar, self.graph, self.bg_canvas):
+        for canv in (self.badge, self.matrix, self.scanbar, self.graph):
             canv.configure(bg=c["text_bg"], highlightbackground=c["dim"])
+        self.bg_canvas.configure(bg=c["bg"])
         self.flash.configure(bg=c["bg"], fg=c["accent"])
         self.draw_badge()
+        self.draw_background_frame()
 
     def change_mode(self, name):
         if name not in MODES:
