@@ -227,11 +227,11 @@ help
 tools
 kalihelp TOOL
 scenario TOOL
-scan
-decrypt
-trace
-mission
 crack
+effects
+status
+boss
+game
 effects
 boss
 matrix
@@ -404,7 +404,7 @@ Current sources are free/open assets from OpenGameArt.
 
 Private/casual sharing is ready from this folder. For a public release, handle these items first:
 
-- Add a project code license file if you want others to modify or redistribute the Python/shell code. Without one, the code has no explicit open-source license.
+- Keep `LICENSE` with the package; it provides the project code license.
 - Keep `assets/music/SOURCES.md` with the package. The voice pack requires VoiceBosch attribution and is listed as CC-BY-SA 4.0.
 - Adult mode contains innuendo. If sharing broadly, mention that clearly or remove/disable that mode for a clean package.
 - The app uses documentation/demo target ranges such as `192.0.2.0/24`, `198.51.100.0/24`, and `203.0.113.0/24`. These are intentionally reserved example ranges.
@@ -425,7 +425,7 @@ Hacker Game/
 Before sharing, run:
 
 ```bash
-python3 -m py_compile hacker_terminal.py
+python3 -m py_compile hacker_terminal.py  # creates __pycache__; run on a temp copy for inspect-only checks
 bash -n install.sh
 bash -n uninstall.sh
 ./install.sh --name "Test" --mode cyber

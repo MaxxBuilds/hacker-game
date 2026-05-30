@@ -44,7 +44,7 @@ The installer writes only into the current user account:
 ~/Desktop/Hacker Game.desktop        if a Desktop folder exists and --no-desktop is not used
 ```
 
-The installer may also remove exact legacy files from an earlier app id, `hacker-terminal-game`, during install/uninstall cleanup.
+Legacy cleanup to review before release: the live Pi previously had an older `fake-hacker-terminal` install layout. The current installer/uninstaller should only remove exact, confirmed app-owned legacy paths when that cleanup is intentionally included.
 
 ## Uninstall
 
